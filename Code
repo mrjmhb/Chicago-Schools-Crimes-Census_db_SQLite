@@ -1,0 +1,224 @@
+Introduction
+Using this Python notebook you will:
+
+Understand three Chicago datasets
+Load the three datasets into three tables in a SQLIte database
+Execute SQL queries to answer assignment questions
+Understand the datasets
+To complete the assignment problems in this notebook you will be using three datasets that are available on the city of Chicago's Data Portal:
+
+Socioeconomic Indicators in Chicago
+Chicago Public Schools
+Chicago Crime Data
+1. Socioeconomic Indicators in Chicago
+This dataset contains a selection of six socioeconomic indicators of public health significance and a “hardship index,” for each Chicago community area, for the years 2008 – 2012.
+
+A detailed description of this dataset and the original dataset can be obtained from the Chicago Data Portal at:
+
+https://data.cityofchicago.org/Health-Human-Services/Census-Data-Selected-socioeconomic-indicators-in-C/kn9c-c2s2
+
+2. Chicago Public Schools
+This dataset shows all school level performance data used to create CPS School Report Cards for the 2011-2012 school year. This dataset is provided by the city of Chicago's Data Portal.
+
+A detailed description of this dataset and the original dataset can be obtained from the Chicago Data Portal at:
+
+https://data.cityofchicago.org/Education/Chicago-Public-Schools-Progress-Report-Cards-2011-/9xs2-f89t
+
+3. Chicago Crime Data
+This dataset reflects reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 2001 to present, minus the most recent seven days.
+
+A detailed description of this dataset and the original dataset can be obtained from the Chicago Data Portal at:
+
+https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2
+
+Download the datasets
+This assignment requires you to have these three tables populated with a subset of the whole datasets.
+
+In many cases the dataset to be analyzed is available as a .CSV (comma separated values) file, perhaps on the internet.
+
+Use the links below to read the data files using the Pandas library.
+
+Chicago Census Data
+https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCensusData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01
+
+Chicago Public Schools
+https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoPublicSchools.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01
+
+Chicago Crime Data
+https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCrimeData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01
+
+NOTE: Ensure you use the datasets available on the links above instead of directly from the Chicago Data Portal. The versions linked here are subsets of the original datasets and have some of the column names modified to be more database friendly which will make it easier to complete this assignment.
+
+Store the datasets in database tables
+To analyze the data using SQL, it first needs to be loaded into SQLite DB. We will create three tables in as under:
+
+CENSUS_DATA
+CHICAGO_PUBLIC_SCHOOLS
+CHICAGO_CRIME_DATA
+Load the pandas and sqlite3 libraries and establish a connection to FinalDB.db
+
+import csv, sqlite3
+con = sqlite3.connect("FinalDB.db")
+cur = con.cursor()
+!pip install -q pandas==1.1.5
+Load the SQL magic module
+
+%load_ext sql
+%sql sqlite:///FinalDB.db
+The sql extension is already loaded. To reload it, use:
+  %reload_ext sql
+'Connected: @FinalDB.db'
+Use Pandas to load the data available in the links above to dataframes. Use these dataframes to load data on to the database FinalDB.db as required tables.
+
+import pandas
+df = pandas.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCensusData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01")
+df.to_sql("CENSUS_DATA", con, if_exists='replace', index=False,method="multi")
+​
+df = pandas.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoCrimeData.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01")
+df.to_sql("CHICAGO_CRIME_DATA", con, if_exists='replace', index=False, method="multi")
+​
+df = pandas.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DB0201EN-SkillsNetwork/labs/FinalModule_Coursera_V5/data/ChicagoPublicSchools.csv?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10006555&utm_id=NA-SkillsNetwork-Channel-SkillsNetworkCoursesIBMDeveloperSkillsNetworkDB0201ENSkillsNetwork20127838-2021-01-01")
+df.to_sql("CHICAGO_PUBLIC_SCHOOLS_DATA", con, if_exists='replace', index=False, method="multi")
+​
+Establish a connection between SQL magic module and the database FinalDB.db
+
+%sql SELECT name FROM sqlite_master WHERE type='table'
+ * sqlite:///FinalDB.db
+Done.
+name
+CENSUS_DATA
+CHICAGO_CRIME_DATA
+CHICAGO_PUBLIC_SCHOOLS_DATA
+You can now proceed to the the following questions. Please note that a graded assignment will follow this lab and there will be a question on each of the problems stated below. It can be from the answer you received or the code you write for this problem. Therefore, please keep a note of both your codes as well as the response you generate.
+
+Problems
+Now write and execute SQL queries to solve assignment problems
+
+Problem 1
+Find the total number of crimes recorded in the CRIME table.
+%sql select count(*) from CHICAGO_CRIME_DATA
+ * sqlite:///FinalDB.db
+Done.
+count(*)
+533
+Problem 2
+List community area names and numbers with per capita income less than 11000.
+%sql SELECT Community_Area_Name, Community_Area_Number, Per_Capita_Income \
+from CENSUS_DATA where Per_Capita_Income < 11000\
+Order by Per_Capita_Income DESC 
+ * sqlite:///FinalDB.db
+Done.
+COMMUNITY_AREA_NAME	COMMUNITY_AREA_NUMBER	PER_CAPITA_INCOME
+West Garfield Park	26.0	10934
+Fuller Park	37.0	10432
+South Lawndale	30.0	10402
+Riverdale	54.0	8201
+Problem 3
+List all case numbers for crimes involving minors?(children are not considered minors for the purposes of crime analysis)
+%sql SELECT CASE_NUMBER FROM CHICAGO_CRIME_DATA WHERE DESCRIPTION LIKE '%MINOR%';
+​
+ * sqlite:///FinalDB.db
+Done.
+CASE_NUMBER
+HL266884
+HK238408
+Problem 4
+List all kidnapping crimes involving a child?
+%sql SELECT * FROM CHICAGO_CRIME_DATA WHERE PRIMARY_TYPE = 'KIDNAPPING' AND DESCRIPTION LIKE '%CHILD%';
+​
+ * sqlite:///FinalDB.db
+Done.
+ID	CASE_NUMBER	DATE	BLOCK	IUCR	PRIMARY_TYPE	DESCRIPTION	LOCATION_DESCRIPTION	ARREST	DOMESTIC	BEAT	DISTRICT	WARD	COMMUNITY_AREA_NUMBER	FBICODE	X_COORDINATE	Y_COORDINATE	YEAR	LATITUDE	LONGITUDE	LOCATION
+5276766	HN144152	2007-01-26	050XX W VAN BUREN ST	1792	KIDNAPPING	CHILD ABDUCTION/STRANGER	STREET	0	0	1533	15	29.0	25.0	20	1143050.0	1897546.0	2007	41.87490841	-87.75024931	(41.874908413, -87.750249307)
+Problem 5
+List the kind of crimes that were recorded at schools. (No repetitions)
+%sql SELECT DISTINCT PRIMARY_TYPE FROM CHICAGO_CRIME_DATA WHERE LOCATION_DESCRIPTION LIKE '%SCHOOL%';
+​
+ * sqlite:///FinalDB.db
+Done.
+PRIMARY_TYPE
+BATTERY
+CRIMINAL DAMAGE
+NARCOTICS
+ASSAULT
+CRIMINAL TRESPASS
+PUBLIC PEACE VIOLATION
+Problem 6
+List the type of schools along with the average safety score for each type.
+%sql SELECT CASE WHEN UPPER(NAME_OF_SCHOOL) LIKE '%ELEMENTARY%' THEN 'ES'\
+ELSE 'HS' END AS SCHOOL_TYPE, AVG(SAFETY_SCORE) AS AVERAGE_SAFETY_SCORE\
+FROM CHICAGO_PUBLIC_SCHOOLS_DATA GROUP BY SCHOOL_TYPE;
+ * sqlite:///FinalDB.db
+Done.
+SCHOOL_TYPE	AVERAGE_SAFETY_SCORE
+ES	49.75247524752475
+HS	48.58715596330275
+Problem 7
+List 5 community areas with highest % of households below poverty line
+%sql SELECT COMMUNITY_AREA_NUMBER, COMMUNITY_AREA_NAME, PERCENT_HOUSEHOLDS_BELOW_POVERTY\
+FROM CENSUS_DATA ORDER BY PERCENT_HOUSEHOLDS_BELOW_POVERTY DESC LIMIT 5;
+​
+ * sqlite:///FinalDB.db
+Done.
+COMMUNITY_AREA_NUMBER	COMMUNITY_AREA_NAME	PERCENT_HOUSEHOLDS_BELOW_POVERTY
+54.0	Riverdale	56.5
+37.0	Fuller Park	51.2
+68.0	Englewood	46.6
+29.0	North Lawndale	43.1
+27.0	East Garfield Park	42.4
+Problem 8
+Which community area is most crime prone? Display the coumminty area number only.
+%sql SELECT COMMUNITY_AREA_NUMBER FROM CHICAGO_CRIME_DATA GROUP BY COMMUNITY_AREA_NUMBER ORDER BY COUNT(*) DESC LIMIT 1;
+​
+ * sqlite:///FinalDB.db
+Done.
+COMMUNITY_AREA_NUMBER
+25.0
+Problem 9
+Use a sub-query to find the name of the community area with highest hardship index
+%sql SELECT COMMUNITY_AREA_NAME FROM CENSUS_DATA WHERE HARDSHIP_INDEX = (SELECT MAX(HARDSHIP_INDEX) FROM CENSUS_DATA);
+​
+ * sqlite:///FinalDB.db
+Done.
+COMMUNITY_AREA_NAME
+Riverdale
+Problem 10
+Use a sub-query to determine the Community Area Name with most number of crimes?
+
+
+
+
+
+
+%sql SELECT CENSUS.COMMUNITY_AREA_NAME FROM CHICAGO_CRIME_DATA AS CRIME\
+JOIN CENSUS_DATA AS CENSUS ON CRIME.COMMUNITY_AREA_NUMBER = CENSUS.COMMUNITY_AREA_NUMBER\
+GROUP BY CRIME.COMMUNITY_AREA_NUMBER ORDER BY COUNT(*) DESC LIMIT 1;
+ * sqlite:///FinalDB.db
+Done.
+COMMUNITY_AREA_NAME
+Austin
+Author(s)
+Hima Vasudevan 
+Rav Ahuja 
+Ramesh Sannreddy 
+Contribtuor(s)
+Malika Singla 
+Abhishek Gagneja
+Change log
+Date	Version	Changed by	Change Description
+2023-10-18	2.6	Abhishek Gagneja	Modified instruction set
+2022-03-04	2.5	Lakshmi Holla	Changed markdown.
+2021-05-19	2.4	Lakshmi Holla	Updated the question
+2021-04-30	2.3	Malika Singla	Updated the libraries
+2021-01-15	2.2	Rav Ahuja	Removed problem 11 and fixed changelog
+2020-11-25	2.1	Ramesh Sannareddy	Updated the problem statements, and datasets
+2020-09-05	2.0	Malika Singla	Moved lab to course repo in GitLab
+2018-07-18	1.0	Rav Ahuja	Several updates including loading instructions
+2018-05-04	0.1	Hima Vasudevan	Created initial version
+© IBM Corporation 2023. All rights reserved. 
+
+Simple
+0
+2
+
+Python | Idle
